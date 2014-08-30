@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Todo App</string>
+    <string name="add">ADD</string>
+    <string name="add_todo_hint">Enter todo here</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
