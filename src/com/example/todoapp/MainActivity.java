@@ -6,10 +6,9 @@ import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,12 +17,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+import com.example.todoapp.EditItemDialogFragment.EditItemDialogListener;
 
-	private static final String EXTRA_TODO_LIST = "todo_list";
+public class MainActivity extends FragmentActivity implements EditItemDialogListener {
 
-	private static final int REQUEST_TODO_EDIT = 1;
-
+	public static final String TAG = "MainActivity";
+	
 	private final ArrayList<String> mTodoItems = new ArrayList<String>();
 	private ArrayAdapter<String> mAdapter;
 	private EditText mEditText;
@@ -39,6 +38,7 @@ public class MainActivity extends Activity {
 				android.R.layout.simple_list_item_1, mTodoItems);
 		listView.setAdapter(mAdapter);
 
+		// Add todo item
 		View addButton = findViewById(R.id.add_button);
 		addButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -52,20 +52,18 @@ public class MainActivity extends Activity {
 			}
 		});
 
+		// Open edit dialog
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Intent intent = new Intent(MainActivity.this,
-						EditTodoItemActivity.class);
-				intent.putExtra(EditTodoItemActivity.EXTRA_TODO_ITEM,
+				EditItemDialogFragment fragment = EditItemDialogFragment.newInstance(position, 
 						mAdapter.getItem(position));
-				intent.putExtra(EditTodoItemActivity.EXTRA_ITEM_POSITION,
-						position);
-				MainActivity.this.startActivityForResult(intent,
-						REQUEST_TODO_EDIT);
+				fragment.setListener(MainActivity.this);
+				fragment.show(MainActivity.this.getSupportFragmentManager(), "edit_todo_dialog");
 			}
 		});
 
+		// Delete todo item
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -80,27 +78,18 @@ public class MainActivity extends Activity {
 		
 		new ReadTodoTask().execute();
 	}
-
+	
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == Activity.RESULT_OK) {
-			if (requestCode == REQUEST_TODO_EDIT) {
-				final String newTodo = data
-						.getStringExtra(EditTodoItemActivity.EXTRA_TODO_ITEM).trim();
-				final int position = data.getIntExtra(
-						EditTodoItemActivity.EXTRA_ITEM_POSITION, 0);
-				if (!mTodoItems.get(position).equals(newTodo)) {
-					mTodoItems.set(position, newTodo);
-					mAdapter.notifyDataSetChanged();
-					new SaveTodoTask().execute();
-					Toast.makeText(this, R.string.updated_todo, Toast.LENGTH_LONG)
-							.show();
-				}
-			}
+	public void onEditItemFinished(int position, String newItem) {
+		if (!mTodoItems.get(position).equals(newItem)) {
+			mTodoItems.set(position, newItem);
+			mAdapter.notifyDataSetChanged();
+			new SaveTodoTask().execute();
+			Toast.makeText(this, R.string.updated_todo, Toast.LENGTH_LONG)
+					.show();
 		}
 	}
-	
+
 	private class SaveTodoTask extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -109,7 +98,7 @@ public class MainActivity extends Activity {
 			try {
 				FileUtils.writeLines(todoFile, mTodoItems);
 			} catch (IOException ex) {
-				Log.e("MainActivity", "Error while writing to todo file", ex);
+				Log.e(TAG, "Error while writing to todo file", ex);
 			}
 			return null;
 		}
@@ -126,9 +115,10 @@ public class MainActivity extends Activity {
 				mTodoItems.addAll(listItems);
 				mAdapter.notifyDataSetChanged();
 			} catch (IOException ex) {
-				Log.e("MainActivity", "Error while reading to todo file", ex);
+				Log.e(TAG, "Error while reading to todo file", ex);
 			}
 			return null;
 		}
 	}
+
 }

@@ -10,5 +10,6 @@
     <string name="updated_todo">Updated todo item</string>
     <string name="deleted_todo">Deleted todo item</string>
 	<string name="edit_todo_lable">Edit Item Below:</string>
+	<string name="edit_todo_dialog_title">Edit Item</string>
 	
 </resources>
