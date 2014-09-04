@@ -7,6 +7,7 @@ Completed features:
  * [x] Update todo item on click
  
 Notes:
+* [x] Using SQLite to store todo list
 * [x] Using DialogFragment to edit todo item
 * [x] Added Toast to notify user
 * [x] File read/write operation through AsyncTask

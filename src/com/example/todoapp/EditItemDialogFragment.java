@@ -22,11 +22,11 @@ public class EditItemDialogFragment extends DialogFragment {
 		this.mListener = listener;
 	}
 
-	public static EditItemDialogFragment newInstance(int position, String item) {
+	public static EditItemDialogFragment newInstance(int position, Todo todo) {
 		EditItemDialogFragment dialog = new EditItemDialogFragment();
 		Bundle bundle = new Bundle();
 		bundle.putInt(ARG_POSITION, position);
-		bundle.putString(ARG_ITEM, item);
+		bundle.putString(ARG_ITEM, todo.getItem());
 		dialog.setArguments(bundle);
 		return dialog;
 	}
